@@ -1,0 +1,22 @@
+<%- include('partials/head', { title: 'デッキ作成' }) %>
+<h1>デッキ作成</h1>
+<p>今から使うデッキの登録です。使用時期や大会の記録は後から必要になったら <a href="/decks/new-past">過去デッキ登録</a> の形式でも追加できます。同じ名前で作っても上書きされず、別バージョンとして残ります。</p>
+<% if (error) { %><p class="error"><%= error %></p><% } %>
+<form method="POST" action="/decks">
+  <input type="hidden" name="form_type" value="new">
+  <div>
+    <label>デッキ名</label>
+    <input type="text" name="name" value="<%= form.name || '' %>" required>
+  </div>
+  <h2>カードを選ぶ（枚数を入力）</h2>
+  <% cards.forEach(function(c) { %>
+    <div class="deck-select-row">
+      <span class="name"><span class="tag type-tag"><%= c.card_type || '虫' %></span> 第<%= c.set_no %>弾 <%= c.name %></span>
+      <input type="hidden" name="card_id" value="<%= c.id %>">
+      <input type="number" name="quantity" min="0" value="0">
+    </div>
+  <% }); %>
+  <% if (cards.length === 0) { %><p>先にカードを登録してください。</p><% } %>
+  <button type="submit">デッキを保存</button>
+</form>
+<%- include('partials/foot', { active: 'decks' }) %>

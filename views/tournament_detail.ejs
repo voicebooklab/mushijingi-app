@@ -1,0 +1,57 @@
+<%- include('partials/head', { title: t.name || t.date }) %>
+<h1><%= t.date %><% if (t.name) { %> <%= t.name %><% } %></h1>
+<div class="card-box">
+  <span class="tag"><%= t.result || '-' %></span>
+  <% if (t.deck_name) { %><div>使用デッキ: <a href="/decks/<%= t.deck_id %>"><%= t.deck_name %></a></div><% } %>
+  <% if (t.memo) { %><div>メモ: <%= t.memo %></div><% } %>
+</div>
+
+<h2>各試合の記録（<%= matches.length %>試合）</h2>
+<% matches.forEach(function(m, i) { %>
+  <div class="list-item">
+    <strong>試合<%= i + 1 %></strong> <span class="tag"><%= m.result || '-' %></span>
+    <% if (m.opponent_name) { %><div>相手: <%= m.opponent_name %></div><% } %>
+    <% if (m.opponent_notes) { %><div>相手の特徴／使われたカード: <%= m.opponent_notes %></div><% } %>
+    <% if (m.good_points) { %><div>良かった点: <%= m.good_points %></div><% } %>
+    <% if (m.improve_points) { %><div>失敗した点／改善点: <%= m.improve_points %></div><% } %>
+    <% if (m.memo) { %><div>メモ: <%= m.memo %></div><% } %>
+  </div>
+<% }); %>
+<% if (matches.length === 0) { %><p>まだ試合記録がありません。</p><% } %>
+
+<h2>試合を追加</h2>
+<form method="POST" action="/tournaments/<%= t.id %>/matches">
+  <div>
+    <label>勝ち／負け</label>
+    <select name="result">
+      <option value="">選択してください</option>
+      <option value="勝ち">勝ち</option>
+      <option value="負け">負け</option>
+      <option value="引き分け">引き分け</option>
+    </select>
+  </div>
+  <div>
+    <label>相手または相手デッキ名</label>
+    <input type="text" name="opponent_name">
+  </div>
+  <div>
+    <label>相手の特徴／使われたカード</label>
+    <textarea name="opponent_notes"></textarea>
+  </div>
+  <div>
+    <label>良かった点</label>
+    <textarea name="good_points"></textarea>
+  </div>
+  <div>
+    <label>失敗した点／改善点</label>
+    <textarea name="improve_points"></textarea>
+  </div>
+  <div>
+    <label>メモ</label>
+    <textarea name="memo"></textarea>
+  </div>
+  <button type="submit">この試合を記録する</button>
+</form>
+
+<a class="btn" href="/tournaments">大会・戦績一覧へ戻る</a>
+<%- include('partials/foot', { active: 'tournaments' }) %>

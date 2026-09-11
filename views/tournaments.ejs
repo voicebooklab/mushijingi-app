@@ -1,0 +1,15 @@
+<%- include('partials/head', { title: '大会・戦績' }) %>
+<h1>大会・戦績記録</h1>
+<a class="btn" href="/tournaments/new">記録を追加</a>
+<h2>&nbsp;</h2>
+<% tournaments.forEach(function(t) { %>
+  <div class="card-box">
+    <div><a href="/tournaments/<%= t.id %>"><strong><%= t.date %></strong></a> <span class="tag"><%= t.result || '-' %></span></div>
+    <% if (t.name) { %><div>大会名: <%= t.name %></div><% } %>
+    <div>使用デッキ: <% if (t.deck_name) { %><a href="/decks/<%= t.deck_id %>"><%= t.deck_name %></a><% } else { %>(未設定)<% } %></div>
+    <% if (t.memo) { %><div>メモ: <%= t.memo %></div><% } %>
+    <div><a href="/tournaments/<%= t.id %>">各試合の記録を見る →</a></div>
+  </div>
+<% }); %>
+<% if (tournaments.length === 0) { %><p>記録がまだありません。</p><% } %>
+<%- include('partials/foot', { active: 'tournaments' }) %>

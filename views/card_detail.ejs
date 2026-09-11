@@ -1,0 +1,58 @@
+<%- include('partials/head', { title: card.name }) %>
+<h1><span class="tag type-tag"><%= card.card_type || '虫' %></span> <%= card.name %> <span class="tag">第<%= card.set_no %>弾</span></h1>
+<div class="card-box">
+  <% if (card.cost !== null) { %><span class="tag">コスト<%= card.cost %></span><% } %>
+  <% if ((card.card_type === '虫' || !card.card_type)) { %>
+    <% if (card.hp !== null) { %><span class="tag">体力<%= card.hp %></span><% } %>
+    <% if (card.color) { %><span class="tag"><%= card.color %></span><% } %>
+    <% if (card.attack1_text) { %><div>攻撃1: <%= card.attack1_text %></div><% } %>
+    <% if (card.effect1_text) { %><div>【効果1】<%= card.effect1_text %></div><% } %>
+    <% if (card.attack2_text) { %><div>攻撃2: <%= card.attack2_text %></div><% } %>
+    <% if (card.effect2_text) { %><div>【効果2】<%= card.effect2_text %></div><% } %>
+  <% } else if (card.card_type === '術') { %>
+    <% if (card.spell_effect_text) { %><div>効果: <%= card.spell_effect_text %></div><% } %>
+  <% } else if (card.card_type === '強化') { %>
+    <% if (card.boost_modifier_text) { %><div>修正値: <%= card.boost_modifier_text %></div><% } %>
+    <% if (card.boost_effect_text) { %><div>効果: <%= card.boost_effect_text %></div><% } %>
+  <% } %>
+</div>
+
+<h2>攻略メモ</h2>
+<form method="POST" action="/cards/<%= card.id %>/notes">
+  <div>
+    <label>良かった使い方</label>
+    <textarea name="good_usage_text"><%= card.good_usage_text || '' %></textarea>
+  </div>
+  <div>
+    <label>失敗した使い方</label>
+    <textarea name="bad_usage_text"><%= card.bad_usage_text || '' %></textarea>
+  </div>
+  <div>
+    <label>相性が良かったカード</label>
+    <textarea name="good_matchup_text"><%= card.good_matchup_text || '' %></textarea>
+  </div>
+  <div>
+    <label>苦手だったカード／注意点</label>
+    <textarea name="bad_matchup_text"><%= card.bad_matchup_text || '' %></textarea>
+  </div>
+  <div>
+    <label>その他メモ</label>
+    <textarea name="memo_text"><%= card.memo_text || '' %></textarea>
+  </div>
+  <button type="submit">メモを保存</button>
+</form>
+
+<h2>大会履歴（このカードを使ったデッキの成績）</h2>
+<% if (history.length === 0) { %>
+  <p>まだ大会記録がありません。</p>
+<% } %>
+<% history.forEach(function(h) { %>
+  <div class="list-item">
+    <div><strong><%= h.date %></strong> <span class="tag"><%= h.result || '-' %></span></div>
+    <% if (h.tournament_name) { %><div>大会名: <%= h.tournament_name %></div><% } %>
+    <div>使用デッキ: <a href="/decks/<%= h.deck_id %>"><%= h.deck_name %></a></div>
+  </div>
+<% }); %>
+
+<a class="btn" href="/cards">一覧へ戻る</a>
+<%- include('partials/foot', { active: 'list' }) %>

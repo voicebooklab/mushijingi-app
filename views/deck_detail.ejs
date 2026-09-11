@@ -1,0 +1,47 @@
+<%- include('partials/head', { title: deck.name }) %>
+<h1><%= deck.name %></h1>
+
+<h2>使用カード</h2>
+<% deckCards.forEach(function(c) { %>
+  <div class="list-item">
+    <span class="tag"><%= c.quantity %>枚</span>
+    <span class="tag type-tag"><%= c.card_type || '虫' %></span>
+    <a href="/cards/<%= c.id %>"><strong><%= c.name %></strong></a> <span class="tag">第<%= c.set_no %>弾</span>
+  </div>
+<% }); %>
+<% if (deckCards.length === 0) { %><p>カードが入っていません。</p><% } %>
+
+<h2>使用履歴</h2>
+<div class="card-box">
+  <% if (deck.used_period) { %><div>使用時期: <%= deck.used_period %></div><% } %>
+  <% if (deck.tournament_name) { %><div>大会名: <%= deck.tournament_name %></div><% } %>
+  <% if (deck.win_count !== null || deck.loss_count !== null) { %><div><%= deck.win_count || 0 %>勝<%= deck.loss_count || 0 %>敗</div><% } %>
+  <% if (deck.good_points) { %><div>良かった点: <%= deck.good_points %></div><% } %>
+  <% if (deck.improve_points) { %><div>改善したい点: <%= deck.improve_points %></div><% } %>
+  <% if (deck.memo) { %><div>メモ: <%= deck.memo %></div><% } %>
+  <% if (!deck.used_period && !deck.tournament_name && deck.win_count === null && deck.loss_count === null && !deck.good_points && !deck.improve_points && !deck.memo) { %>
+    <p>使用履歴は未入力です。</p>
+  <% } %>
+</div>
+
+<h2>実際の大会成績（記録済みの大会・戦績から）</h2>
+<% tournamentHistory.forEach(function(t) { %>
+  <div class="list-item">
+    <strong><%= t.date %></strong> <span class="tag"><%= t.result || '-' %></span>
+    <% if (t.tournament_name) { %><span> <%= t.tournament_name %></span><% } %>
+  </div>
+<% }); %>
+<% if (tournamentHistory.length === 0) { %><p>このデッキでの大会記録はまだありません。</p><% } %>
+
+<% if (otherVersions.length > 0) { %>
+  <h2>「<%= deck.name %>」の他のバージョン</h2>
+  <% otherVersions.forEach(function(v) { %>
+    <div class="list-item">
+      <a href="/decks/<%= v.id %>"><%= v.created_at %></a>
+      <% if (v.win_count !== null || v.loss_count !== null) { %><span class="tag"><%= v.win_count || 0 %>勝<%= v.loss_count || 0 %>敗</span><% } %>
+    </div>
+  <% }); %>
+<% } %>
+
+<a class="btn" href="/decks">デッキ一覧へ戻る</a>
+<%- include('partials/foot', { active: 'decks' }) %>

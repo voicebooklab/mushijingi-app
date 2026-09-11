@@ -1,0 +1,40 @@
+<%- include('partials/head', { title: 'カード一覧' }) %>
+<h1>カード一覧・検索</h1>
+<form method="GET" action="/cards" class="search-row">
+  <input type="text" name="q" placeholder="カード名で検索" value="<%= q %>">
+  <select name="set_no" onchange="this.form.submit()">
+    <option value="">全弾</option>
+    <% sets.forEach(function(s) { %>
+      <option value="<%= s.set_no %>" <%= String(set_no) === String(s.set_no) ? 'selected' : '' %>>第<%= s.set_no %>弾</option>
+    <% }); %>
+  </select>
+  <button type="submit">検索</button>
+</form>
+<p><%= cards.length %>件</p>
+<% cards.forEach(function(c) { %>
+  <div class="list-item">
+    <div>
+      <span class="tag type-tag"><%= c.card_type || '虫' %></span>
+      <a href="/cards/<%= c.id %>"><strong><%= c.name %></strong></a> <span class="tag">第<%= c.set_no %>弾</span>
+    </div>
+    <div>
+      <% if (c.cost !== null) { %><span class="tag">コスト<%= c.cost %></span><% } %>
+      <% if (c.card_type === '虫' && c.hp !== null) { %><span class="tag">体力<%= c.hp %></span><% } %>
+      <% if (c.card_type === '虫' && c.color) { %><span class="tag"><%= c.color %></span><% } %>
+    </div>
+    <% if (c.card_type === '虫' || !c.card_type) { %>
+      <% if (c.attack1_text) { %><div>攻撃1: <%= c.attack1_text %></div><% } %>
+      <% if (c.effect1_text) { %><div>【効果1】<%= c.effect1_text %></div><% } %>
+      <% if (c.attack2_text) { %><div>攻撃2: <%= c.attack2_text %></div><% } %>
+      <% if (c.effect2_text) { %><div>【効果2】<%= c.effect2_text %></div><% } %>
+    <% } else if (c.card_type === '術') { %>
+      <% if (c.spell_effect_text) { %><div>効果: <%= c.spell_effect_text %></div><% } %>
+    <% } else if (c.card_type === '強化') { %>
+      <% if (c.boost_modifier_text) { %><div>修正値: <%= c.boost_modifier_text %></div><% } %>
+      <% if (c.boost_effect_text) { %><div>効果: <%= c.boost_effect_text %></div><% } %>
+    <% } %>
+    <div><a href="/cards/<%= c.id %>">詳細・攻略メモを見る →</a></div>
+  </div>
+<% }); %>
+<% if (cards.length === 0) { %><p>登録されたカードがありません。</p><% } %>
+<%- include('partials/foot', { active: 'list' }) %>

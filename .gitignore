@@ -1,0 +1,6 @@
+node_modules/
+data/*.sqlite
+certs/
+*.bak_before_libsql
+data/*.bak_*
+.env

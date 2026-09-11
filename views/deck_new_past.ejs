@@ -1,0 +1,52 @@
+<%- include('partials/head', { title: '過去デッキ登録' }) %>
+<h1>過去デッキ登録</h1>
+<p>以前使っていたデッキを、後から記録として登録します。日付や大会名が分からなくても保存できます。</p>
+<% if (error) { %><p class="error"><%= error %></p><% } %>
+<form method="POST" action="/decks">
+  <input type="hidden" name="form_type" value="past">
+  <div>
+    <label>デッキ名</label>
+    <input type="text" name="name" value="<%= form.name || '' %>" required>
+  </div>
+  <h2>使用カード（分かる範囲で枚数を入力）</h2>
+  <% cards.forEach(function(c) { %>
+    <div class="deck-select-row">
+      <span class="name"><span class="tag type-tag"><%= c.card_type || '虫' %></span> 第<%= c.set_no %>弾 <%= c.name %></span>
+      <input type="hidden" name="card_id" value="<%= c.id %>">
+      <input type="number" name="quantity" min="0" value="0">
+    </div>
+  <% }); %>
+  <% if (cards.length === 0) { %><p>先にカードを登録してください。</p><% } %>
+
+  <h2>使用履歴（すべて任意）</h2>
+  <div>
+    <label>使用日／だいたいの時期</label>
+    <input type="text" name="used_period" placeholder="例：2026年6月ごろ" value="<%= form.used_period || '' %>">
+  </div>
+  <div>
+    <label>大会名（分かれば）</label>
+    <input type="text" name="tournament_name" value="<%= form.tournament_name || '' %>">
+  </div>
+  <div>
+    <label>勝数</label>
+    <input type="number" name="win_count" min="0" value="<%= form.win_count || '' %>">
+  </div>
+  <div>
+    <label>敗数</label>
+    <input type="number" name="loss_count" min="0" value="<%= form.loss_count || '' %>">
+  </div>
+  <div>
+    <label>良かった点</label>
+    <textarea name="good_points"><%= form.good_points || '' %></textarea>
+  </div>
+  <div>
+    <label>改善したい点</label>
+    <textarea name="improve_points"><%= form.improve_points || '' %></textarea>
+  </div>
+  <div>
+    <label>自由メモ</label>
+    <textarea name="memo"><%= form.memo || '' %></textarea>
+  </div>
+  <button type="submit">デッキを保存</button>
+</form>
+<%- include('partials/foot', { active: 'decks' }) %>

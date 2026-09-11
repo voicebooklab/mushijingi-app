@@ -1,0 +1,12 @@
+{
+  "name": "虫カード管理",
+  "short_name": "虫カード",
+  "start_url": "/cards/new",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f9f2",
+  "theme_color": "#2f7a4d",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

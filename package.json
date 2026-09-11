@@ -1,0 +1,18 @@
+{
+  "name": "mushijingi-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "カード管理アプリ v1（軽量構成・画像なし）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.18.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0"
+  }
+}

@@ -1,0 +1,26 @@
+<%- include('partials/head', { title: 'デッキ一覧' }) %>
+<h1>デッキ一覧</h1>
+<div class="btn-row">
+  <a class="btn" href="/decks/new">新しいデッキを作る</a>
+  <a class="btn btn-secondary" href="/decks/new-past">過去デッキを登録する</a>
+</div>
+<a href="/decks/compare">→ 2つのデッキを比較する</a>
+<h2>&nbsp;</h2>
+<% groups.forEach(function(g) { %>
+  <div class="card-box">
+    <strong><%= g.name %></strong>
+    <% if (g.versions.length > 1) { %><span class="tag"><%= g.versions.length %>バージョン</span><% } %>
+    <% g.versions.forEach(function(d) { %>
+      <div class="list-item">
+        <a href="/decks/<%= d.id %>"><%= d.created_at %></a>
+        <span class="tag"><%= countMap[d.id] || 0 %>枚</span>
+        <% if (d.win_count !== null || d.loss_count !== null) { %>
+          <span class="tag"><%= d.win_count || 0 %>勝<%= d.loss_count || 0 %>敗</span>
+        <% } %>
+        <% if (d.used_period) { %><span class="tag"><%= d.used_period %></span><% } %>
+      </div>
+    <% }); %>
+  </div>
+<% }); %>
+<% if (groups.length === 0) { %><p>デッキがまだありません。</p><% } %>
+<%- include('partials/foot', { active: 'decks' }) %>

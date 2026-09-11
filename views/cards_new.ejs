@@ -1,0 +1,148 @@
+<%- include('partials/head', { title: 'カード登録' }) %>
+<h1>カード登録</h1>
+<p class="offline-hint">Wi-Fiが無いところでも登録できます。繋がったら自動で送信されます。</p>
+<p id="offline-diag" class="offline-hint"></p>
+<script>
+(function () {
+  const el = document.getElementById('offline-diag');
+  if (!('serviceWorker' in navigator)) {
+    el.textContent = '準備状況：この端末のブラウザは対応していません';
+    return;
+  }
+  function check() {
+    navigator.serviceWorker.getRegistration().then((reg) => {
+      const state = reg && reg.active ? reg.active.state : (reg ? '登録中(未完了)' : 'なし');
+      const controlled = navigator.serviceWorker.controller ? 'はい' : 'いいえ';
+      let errMsg = '';
+      try {
+        const stored = localStorage.getItem('sw_reg_error');
+        if (stored) errMsg = ` / エラー内容=${stored}`;
+      } catch (e) {}
+      el.textContent = `準備状況：登録=${reg ? 'あり' : 'なし'} / 状態=${state} / このページを制御中=${controlled}${errMsg}（${new Date().toLocaleTimeString('ja-JP')}時点）`;
+    }).catch((e) => {
+      el.textContent = '準備状況：確認エラー(' + e.message + ')';
+    });
+  }
+  check();
+  setTimeout(check, 1500);
+  setTimeout(check, 4000);
+})();
+</script>
+<% if (error) { %><p class="error"><%= error %></p><% } %>
+<form method="POST" action="/cards" data-offline-capable="true">
+  <div>
+    <label>カードの種類</label>
+    <div class="type-radio-row">
+      <label class="type-radio"><input type="radio" name="card_type" value="虫" <%= (!form.card_type || form.card_type === '虫') ? 'checked' : '' %>> 虫カード</label>
+      <label class="type-radio"><input type="radio" name="card_type" value="術" <%= form.card_type === '術' ? 'checked' : '' %>> 術カード</label>
+      <label class="type-radio"><input type="radio" name="card_type" value="強化" <%= form.card_type === '強化' ? 'checked' : '' %>> 強化カード</label>
+    </div>
+  </div>
+
+  <div>
+    <label>カード名</label>
+    <input type="text" name="name" value="<%= form.name || '' %>" required>
+  </div>
+  <div>
+    <label>コスト</label>
+    <select name="cost">
+      <option value="">選択してください</option>
+      <% for (let c = 0; c <= 6; c++) { %>
+        <option value="<%= c %>" <%= String(form.cost) === String(c) ? 'selected' : '' %>><%= c %></option>
+      <% } %>
+    </select>
+  </div>
+  <div>
+    <label>第何弾</label>
+    <select name="set_no" required>
+      <option value="">選択してください</option>
+      <% sets.forEach(function(s) { %>
+        <option value="<%= s.set_no %>" <%= String(form.set_no) === String(s.set_no) ? 'selected' : '' %>>第<%= s.set_no %>弾</option>
+      <% }); %>
+    </select>
+  </div>
+
+  <div class="type-section" data-types="虫">
+    <h2>虫カードの項目</h2>
+    <div>
+      <label>体力</label>
+      <select name="hp">
+        <option value="">選択してください</option>
+        <% for (let h = 100; h <= 2000; h += 100) { %>
+          <option value="<%= h %>" <%= String(form.hp) === String(h) ? 'selected' : '' %>><%= h %></option>
+        <% } %>
+      </select>
+    </div>
+    <div>
+      <label>色</label>
+      <select name="color">
+        <option value="">選択してください</option>
+        <option value="赤" <%= form.color === '赤' ? 'selected' : '' %>>赤</option>
+        <option value="青" <%= form.color === '青' ? 'selected' : '' %>>青</option>
+        <option value="緑" <%= form.color === '緑' ? 'selected' : '' %>>緑</option>
+        <option value="無色" <%= form.color === '無色' ? 'selected' : '' %>>無色</option>
+      </select>
+    </div>
+    <div>
+      <label>攻撃1</label>
+      <textarea name="attack1_text"><%= form.attack1_text || '' %></textarea>
+    </div>
+    <div>
+      <label>【効果1】（任意）</label>
+      <textarea name="effect1_text"><%= form.effect1_text || '' %></textarea>
+    </div>
+    <div>
+      <label>攻撃2（任意）</label>
+      <textarea name="attack2_text"><%= form.attack2_text || '' %></textarea>
+    </div>
+    <div>
+      <label>【効果2】（任意）</label>
+      <textarea name="effect2_text"><%= form.effect2_text || '' %></textarea>
+    </div>
+  </div>
+
+  <div class="type-section" data-types="術">
+    <h2>術カードの項目</h2>
+    <div>
+      <label>効果</label>
+      <textarea name="spell_effect_text"><%= form.spell_effect_text || '' %></textarea>
+    </div>
+  </div>
+
+  <div class="type-section" data-types="強化">
+    <h2>強化カードの項目</h2>
+    <div>
+      <label>修正値</label>
+      <input type="text" name="boost_modifier_text" value="<%= form.boost_modifier_text || '' %>">
+    </div>
+    <div>
+      <label>効果</label>
+      <textarea name="boost_effect_text"><%= form.boost_effect_text || '' %></textarea>
+    </div>
+  </div>
+
+  <div class="type-section" data-types="術,強化">
+    <div>
+      <label>メモ（任意）</label>
+      <textarea name="memo_text"><%= form.memo_text || '' %></textarea>
+    </div>
+  </div>
+
+  <button type="submit">登録する</button>
+</form>
+<script>
+(function () {
+  const radios = document.querySelectorAll('input[name="card_type"]');
+  const sections = document.querySelectorAll('.type-section');
+  function applyType(type) {
+    sections.forEach((sec) => {
+      const types = sec.dataset.types.split(',');
+      sec.classList.toggle('hidden', !types.includes(type));
+    });
+  }
+  radios.forEach((r) => r.addEventListener('change', () => applyType(r.value)));
+  const checked = document.querySelector('input[name="card_type"]:checked');
+  applyType(checked ? checked.value : '虫');
+})();
+</script>
+<%- include('partials/foot', { active: 'new' }) %>

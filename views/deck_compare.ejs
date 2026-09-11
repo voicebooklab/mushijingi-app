@@ -1,0 +1,78 @@
+<%- include('partials/head', { title: 'デッキ比較' }) %>
+<h1>デッキ比較</h1>
+<p>比較結果は保存されません。選ぶたびに今のデータから計算し直します。</p>
+<form method="GET" action="/decks/compare">
+  <div>
+    <label>デッキA</label>
+    <select name="a">
+      <option value="">選択してください</option>
+      <% decks.forEach(function(d) { %>
+        <option value="<%= d.id %>" <%= String(aId) === String(d.id) ? 'selected' : '' %>><%= d.name %>（<%= d.created_at %>）</option>
+      <% }); %>
+    </select>
+  </div>
+  <div>
+    <label>デッキB</label>
+    <select name="b">
+      <option value="">選択してください</option>
+      <% decks.forEach(function(d) { %>
+        <option value="<%= d.id %>" <%= String(bId) === String(d.id) ? 'selected' : '' %>><%= d.name %>（<%= d.created_at %>）</option>
+      <% }); %>
+    </select>
+  </div>
+  <button type="submit">比較する</button>
+</form>
+
+<% if (result) { %>
+  <h2>各デッキの情報</h2>
+  <div class="compare-cols">
+    <div class="card-box">
+      <strong><%= result.deckA.name %></strong>
+      <% if (result.deckA.tournament_name) { %><div>大会名: <%= result.deckA.tournament_name %></div><% } %>
+      <% if (result.deckA.win_count !== null || result.deckA.loss_count !== null) { %><div><%= result.deckA.win_count || 0 %>勝<%= result.deckA.loss_count || 0 %>敗</div><% } %>
+      <% if (result.deckA.good_points) { %><div>良かった点: <%= result.deckA.good_points %></div><% } %>
+      <% if (result.deckA.improve_points) { %><div>改善点: <%= result.deckA.improve_points %></div><% } %>
+      <% if (result.deckA.memo) { %><div>メモ: <%= result.deckA.memo %></div><% } %>
+    </div>
+    <div class="card-box">
+      <strong><%= result.deckB.name %></strong>
+      <% if (result.deckB.tournament_name) { %><div>大会名: <%= result.deckB.tournament_name %></div><% } %>
+      <% if (result.deckB.win_count !== null || result.deckB.loss_count !== null) { %><div><%= result.deckB.win_count || 0 %>勝<%= result.deckB.loss_count || 0 %>敗</div><% } %>
+      <% if (result.deckB.good_points) { %><div>良かった点: <%= result.deckB.good_points %></div><% } %>
+      <% if (result.deckB.improve_points) { %><div>改善点: <%= result.deckB.improve_points %></div><% } %>
+      <% if (result.deckB.memo) { %><div>メモ: <%= result.deckB.memo %></div><% } %>
+    </div>
+  </div>
+
+  <h2>共通カード（<%= result.common.length %>種）</h2>
+  <% result.common.forEach(function(c) { %>
+    <div class="list-item">第<%= c.set_no %>弾 <%= c.name %> <span class="tag"><%= c.quantity %>枚</span></div>
+  <% }); %>
+  <% if (result.common.length === 0) { %><p>共通カードはありません。</p><% } %>
+
+  <h2>枚数が変わったカード（<%= result.changed.length %>種）</h2>
+  <% result.changed.forEach(function(c) { %>
+    <div class="list-item">
+      第<%= c.set_no %>弾 <%= c.name %>
+      <span class="tag"><%= result.deckA.name %>: <%= c.qtyA %>枚</span>
+      <span class="tag"><%= result.deckB.name %>: <%= c.qtyB %>枚</span>
+      <% if (c.qtyB > c.qtyA) { %><span class="tag tag-up">+<%= c.qtyB - c.qtyA %></span><% } else { %><span class="tag tag-down">-<%= c.qtyA - c.qtyB %></span><% } %>
+    </div>
+  <% }); %>
+  <% if (result.changed.length === 0) { %><p>枚数が変わったカードはありません。</p><% } %>
+
+  <h2><%= result.deckA.name %>から抜いたカード（<%= result.removed.length %>種）</h2>
+  <% result.removed.forEach(function(c) { %>
+    <div class="list-item">第<%= c.set_no %>弾 <%= c.name %> <span class="tag"><%= c.quantity %>枚</span></div>
+  <% }); %>
+  <% if (result.removed.length === 0) { %><p>抜いたカードはありません。</p><% } %>
+
+  <h2><%= result.deckB.name %>で追加したカード（<%= result.added.length %>種）</h2>
+  <% result.added.forEach(function(c) { %>
+    <div class="list-item">第<%= c.set_no %>弾 <%= c.name %> <span class="tag"><%= c.quantity %>枚</span></div>
+  <% }); %>
+  <% if (result.added.length === 0) { %><p>追加したカードはありません。</p><% } %>
+<% } %>
+
+<a class="btn" href="/decks">デッキ一覧へ戻る</a>
+<%- include('partials/foot', { active: 'decks' }) %>
